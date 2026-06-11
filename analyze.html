@@ -102,10 +102,13 @@
   .modal .ms{font-size:12.5px;color:#9aa3b8;margin-top:8px;line-height:1.5;}
   .modal .mb{margin-top:18px;background:#ffe600;color:#2a1d05;border:0;border-radius:12px;
     padding:13px;width:100%;font-size:14px;font-weight:900;cursor:pointer;}
+  .back-home{display:inline-block;margin:0 0 12px 2px;color:#9aa3b8;font-size:13px;font-weight:800;text-decoration:none;}
+  .back-home:hover{color:#ffe600;}
 </style>
 </head>
 <body>
   <div class="phone">
+    <a class="back-home" href="index.html">← 톡까보기 홈</a>
     <div class="panel">
       <div class="hero-t">🏆 우리 단톡, 진짜 <span class="y">빌런은 누구</span>일까?</div>
       <div class="hero-s">카톡 .txt 하나 올리면 끝. <b style="color:#cfd6e6">내 단톡방</b>으로 바로 시상식 시작.</div>
@@ -224,6 +227,7 @@
       curAnalysis = KakaoStats.analyze(parsed);
       const result = KakaoStats.select(curAnalysis);
       if (curMode === "mine") {
+        try { if (!window.__counted) { window.__counted = 1; fetch("https://abacus.jasoncameron.dev/hit/tokkkaboky/rooms").catch(()=>{}); } } catch (e) {}
         // 내 결과 = 분석 중(10초) 광고 후 공개 + 완료 팝업
         AdGate.run(2, "우리 단톡 분석 중").then(() => { render(result, curRoom, "mine"); showDone(result.awards.length); });
       } else {

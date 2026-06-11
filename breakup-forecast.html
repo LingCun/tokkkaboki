@@ -76,7 +76,7 @@
   .glabel{font-size:13px; color:#b3a8c8; margin-top:4px;}
   .glabel b{color:#ff6a8a;}
   .bar{height:10px; border-radius:999px; margin:16px 4px 6px;
-    background:linear-gradient(90deg,#3ad07a,#f5c043 45%,#ff5a5f); position:relative;}
+    background:linear-gradient(90deg,#ff5a5f,#f5c043 55%,#3ad07a); position:relative;}
   .bar .knob{position:absolute; top:-5px; width:20px; height:20px; border-radius:50%;
     background:#fff; border:3px solid #ff5a5f; transform:translateX(-50%);
     box-shadow:0 2px 10px rgba(0,0,0,.5);}
@@ -133,10 +133,13 @@
   .modal .ms{font-size:12.5px; color:#b3a8c8; margin-top:8px; line-height:1.5;}
   .modal .mb{margin-top:18px; background:linear-gradient(90deg,#7a4dff,#b04dff); color:#fff; border:0;
     border-radius:12px; padding:13px; width:100%; font-size:14px; font-weight:900; cursor:pointer;}
+  .back-home{display:inline-block;margin:0 0 12px 2px;color:#9aa3b8;font-size:13px;font-weight:800;text-decoration:none;}
+  .back-home:hover{color:#fff;}
 </style>
 </head>
 <body>
   <div class="phone">
+    <a class="back-home" href="index.html">← 톡까보기 홈</a>
     <div class="panel">
       <div class="hero-t">🌧️ 우리, 지금 <span class="p">몇 도</span>일까?</div>
       <div class="hero-s">연인과의 1:1 카톡 .txt 올리면 <b style="color:#cfc4e0">우리 관계</b> 애정온도·연인 예보를 봐요.</div>
@@ -262,6 +265,7 @@
       curMode = mode || "mine";
       if (curResult.error) { render(curResult, curMode); return; }
       if (curMode === "mine") {
+        try { if (!window.__counted) { window.__counted = 1; fetch("https://abacus.jasoncameron.dev/hit/tokkkaboky/rooms").catch(()=>{}); } } catch (e) {}
         // 내 결과 = 분석 중(10초) 광고 후 공개 + 완료 팝업
         AdGate.run(2, "우리 관계 분석 중").then(() => { render(curResult, "mine"); showDone(); });
       } else {

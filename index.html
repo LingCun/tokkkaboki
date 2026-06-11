@@ -137,7 +137,7 @@
     <a class="mode love" id="m-love" href="breakup-forecast.html">
       <div class="price">무료</div>
       <div class="m-row">
-        <div class="m-emoji">🌧️</div>
+        <div class="m-emoji">☀️</div>
         <div class="m-main">
           <div class="m-kicker">1:1 · 연인 대화</div>
           <div class="m-title">연인 예보</div>
@@ -150,7 +150,7 @@
       </div>
     </a>
 
-    <div class="count">지금까지 <b>128,402개</b> 대화방이 까였습니다 👀</div>
+    <div class="count" id="count-line" style="display:none">지금까지 <b><span id="count-n"></span>개</b> 대화방이 까였습니다 👀</div>
 
     <div class="privacy">
       🔒 <b>대화는 서버에 안 올라갑니다.</b><br>
@@ -232,5 +232,16 @@
     // 모드 카드는 <a href>로 그대로 이동. sessionStorage가 데이터 전달.
     // 업로드 안 했으면 결과 페이지가 샘플로 폴백.
   </script>
+<script>
+// 실제 분석 카운터 (Abacus 무료 카운터 API) — 값을 못 받으면 줄 자체를 숨김(가짜 숫자 없음)
+fetch("https://abacus.jasoncameron.dev/get/tokkkaboky/rooms")
+  .then(r => r.ok ? r.json() : null)
+  .then(d => {
+    if (d && typeof d.value === "number" && d.value > 0) {
+      document.getElementById("count-n").textContent = d.value.toLocaleString();
+      document.getElementById("count-line").style.display = "";
+    }
+  }).catch(() => {});
+</script>
 </body>
 </html>

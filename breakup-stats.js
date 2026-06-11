@@ -1,7 +1,7 @@
 // breakup-stats.js — 1:1 연인 대화 → "연인 예보" 분석. Pure functions.
 // HONEST NOTE: 카톡 .txt엔 '읽음'·감정 데이터 없음. '애정온도 %'는 답장속도/
 // 빈도/ㅋ길이/먼저연락 균형을 가중합한 PROXY 점수다 (재미용, 사실 아님).
-// 높을수록 = 식는 중(cooling). 100 = 한파.
+// 높을수록 = 따뜻함(맑음), 낮을수록 = 한파. (내부 cooling 점수를 100에서 반전)
 
 (function (global) {
   "use strict";
@@ -95,10 +95,11 @@
 
     // ---- 애정온도 = cooling 복합점수 (높을수록 식음) ----
     const W = { reply: .30, balance: .25, freq: .20, laugh: .15, night: .10 };
-    const temp = Math.round(
+    const cooling = Math.round(
       (W.reply * s_reply + W.balance * balance + W.freq * freqDrop +
        W.laugh * laughDrop + W.night * nightDrop) * 100
     );
+    const temp = 100 - cooling; // 애정온도: 높을수록 맑음
 
     // ---- 월별 온기 추세 (warmth, 높을수록 따뜻 — 차트용) ----
     const byMonth = {};
@@ -119,9 +120,9 @@
 
     // ---- 날씨 메타포 (하트 금지, 날씨로) ----
     let wx, alert, state;
-    if (temp < 25) { wx = "☀️"; alert = "맑음 · 안정권"; state = "따뜻함"; }
-    else if (temp < 50) { wx = "⛅"; alert = "구름 조금 · 양호"; state = "미지근"; }
-    else if (temp < 70) { wx = "🌧️"; alert = "비 · 식는 중"; state = "식는 중"; }
+    if (temp > 75) { wx = "☀️"; alert = "맑음 · 안정권"; state = "따뜻함"; }
+    else if (temp > 50) { wx = "⛅"; alert = "구름 조금 · 양호"; state = "미지근"; }
+    else if (temp > 30) { wx = "🌧️"; alert = "비 · 식는 중"; state = "식는 중"; }
     else { wx = "🌨️"; alert = "⚠ 한파주의보 · 권태기 진입"; state = "한파"; }
 
     // 지난달 대비 온기 변화 → 온도(식음) 변화로 환산
@@ -148,7 +149,7 @@
       { k: "답장 지연", v: s_reply }, { k: "먼저연락 불균형", v: balance },
       { k: "대화량 감소", v: freqDrop }, { k: "웃음 감소", v: laughDrop },
     ].sort((a, b) => b.v - a.v);
-    const band = temp >= 70 ? "cold" : temp >= 50 ? "cool" : "warm";
+    const band = temp <= 30 ? "cold" : temp <= 50 ? "cool" : "warm";
 
     // ---- 유료 잠금 티저 (실제 카운트로 미끼) ----
     const fightHits = msgs.filter(m => FIGHT_RE.test(m.text)).length;

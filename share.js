@@ -90,7 +90,7 @@
     // 온도바
     const bx = 40, bw = W - 80, by = 338;
     const barG = c.createLinearGradient(bx, 0, bx + bw, 0);
-    barG.addColorStop(0, "#3ad07a"); barG.addColorStop(.45, "#f5c043"); barG.addColorStop(1, "#ff5a5f");
+    barG.addColorStop(0, "#ff5a5f"); barG.addColorStop(.55, "#f5c043"); barG.addColorStop(1, "#3ad07a");
     rr(c, bx, by, bw, 9, 5); c.fillStyle = barG; c.fill();
     const kx = bx + bw * Math.min(98, Math.max(2, result.temp)) / 100;
     c.beginPath(); c.arc(kx, by + 4.5, 9, 0, Math.PI * 2); c.fillStyle = "#fff"; c.fill();
