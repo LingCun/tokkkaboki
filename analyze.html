@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>톡까보기 — 분석 (동작)</title>
+<style>
+  :root{--card:#fffdf5;--ink:#1d1b16;--sub:#6b6457;--accent:#ff5a5f;--line:#ece6d6;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:radial-gradient(1200px 600px at 50% -10%,#1b2030,#0f1115);min-height:100vh;
+    display:flex;flex-direction:column;align-items:center;padding:26px 16px 50px;
+    font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;color:var(--ink);}
+  .phone{width:380px;max-width:100%;}
+  .panel{background:#161922;border:1px solid #2a3040;border-radius:18px;padding:18px 16px;margin-bottom:16px;color:#e7ebf4;}
+  .hero-t{font-size:18px;font-weight:900;color:#fff;line-height:1.3;}
+  .hero-t .y{background:linear-gradient(90deg,#ffe600,#ffb84d);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .hero-s{font-size:12.5px;color:#9aa3b8;margin:7px 0 14px;line-height:1.5;}
+  .b-file{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;text-align:center;
+    background:linear-gradient(90deg,#ffe600,#ffc400);color:#3b1e1e;border:0;border-radius:13px;
+    padding:15px;font-weight:900;font-size:14.5px;cursor:pointer;box-shadow:0 8px 22px rgba(255,214,0,.18);}
+  .b-file:active{transform:scale(.99);}
+  .alt{margin-top:11px;text-align:center;font-size:12px;color:#7f879b;}
+  .alt a{color:#9ab4ff;text-decoration:none;cursor:pointer;}
+  .alt a:hover{text-decoration:underline;}
+  textarea{width:100%;height:110px;background:#0f131b;border:1px solid #2a3040;border-radius:11px;
+    color:#aeb6c8;font-size:11px;padding:10px;font-family:ui-monospace,monospace;resize:vertical;margin-top:11px;}
+  .hide{display:none;}
+  .note{font-size:11px;color:#7f879b;margin-top:10px;line-height:1.5;text-align:center;}
+
+  /* 예시(광고) 배너 — 샘플 결과 위에 */
+  .demo-cta{background:linear-gradient(100deg,#2a2406,#1c1804);border:1px solid #4a3f0e;border-radius:16px;
+    padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+  .demo-cta .dc-ic{font-size:26px;flex:none;}
+  .demo-cta .dc-t{flex:1;min-width:0;}
+  .demo-cta .dc-t b{display:block;font-size:13px;color:#ffe600;font-weight:900;}
+  .demo-cta .dc-t span{font-size:11.5px;color:#cbb870;}
+  .demo-cta .dc-btn{flex:none;background:#ffe600;color:#3b1e1e;font-size:12.5px;font-weight:900;
+    padding:11px 14px;border:0;border-radius:11px;cursor:pointer;white-space:nowrap;}
+  /* 예시 카드 코너 리본 */
+  .ribbon{position:absolute;top:13px;right:-34px;transform:rotate(45deg);background:#3b1e1e;color:#ffe600;
+    font-size:10.5px;font-weight:900;letter-spacing:.1em;padding:5px 38px;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:2;}
+  .card{position:relative;}
+  /* 내 결과 배지 */
+  .mine-badge{display:inline-flex;align-items:center;gap:5px;background:#0e7a3a;color:#d6ffe6;
+    font-size:11px;font-weight:900;letter-spacing:.04em;padding:5px 11px;border-radius:999px;}
+
+  /* result card (from villain-report) */
+  .card{background:var(--card);border-radius:26px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.45);}
+  .top{background:linear-gradient(135deg,#ffe600,#ffd000);padding:22px 22px 18px;}
+  .badge{display:inline-block;background:#3b1e1e;color:#ffe600;font-size:11px;font-weight:800;letter-spacing:.08em;padding:5px 10px;border-radius:999px;}
+  .title{margin-top:12px;font-size:23px;font-weight:900;color:#2a1d05;line-height:1.25;}
+  .room{margin-top:6px;font-size:13px;color:#6b5300;font-weight:700;}
+  .cmeta{margin-top:2px;font-size:11px;color:#8a7300;}
+  .cbody{padding:18px 18px 8px;}
+  .award{display:flex;gap:13px;align-items:center;padding:14px 12px;border:1px solid var(--line);
+    border-radius:16px;margin-bottom:11px;background:#fff;}
+  .award.crown{border-color:#f7d774;background:linear-gradient(180deg,#fffaf0,#fff);}
+  .emoji{font-size:30px;width:46px;height:46px;display:flex;align-items:center;justify-content:center;
+    background:#fbf7ec;border-radius:13px;flex:none;}
+  .a-main{flex:1;min-width:0;}
+  .a-name{font-size:11px;color:var(--accent);font-weight:800;}
+  .a-person{font-size:17px;font-weight:900;margin-top:1px;}
+  .a-desc{font-size:12px;color:var(--sub);margin-top:3px;line-height:1.4;}
+  .a-stat{font-size:18px;font-weight:900;color:#2a1d05;text-align:right;flex:none;}
+  .a-stat small{display:block;font-size:10px;color:var(--sub);font-weight:700;}
+  .strip{display:flex;gap:8px;padding:6px 6px 2px;}
+  .chip{flex:1;background:#f6f2e7;border-radius:13px;padding:11px 8px;text-align:center;}
+  .chip b{display:block;font-size:15px;color:#2a1d05;}
+  .chip span{font-size:10px;color:var(--sub);}
+  .foot{padding:14px 18px 20px;text-align:center;}
+  .priv{font-size:10px;color:#bbb1a0;margin-top:8px;}
+  .disc{font-size:10px;color:#c2b9a6;margin-top:10px;line-height:1.5;text-align:center;}
+
+  /* 액션 버튼 (다시뽑기 / 공유) */
+  .actions{display:flex;gap:8px;margin:14px 0 2px;}
+  .actions button{flex:1;border-radius:999px;padding:12px;font-size:13px;font-weight:900;cursor:pointer;border:1px solid #2a3040;}
+  .act-shuffle{background:#161922;color:#ffe600;}
+  .act-share{background:linear-gradient(90deg,#ffe600,#ffc400);color:#3b1e1e;border:0;}
+  .actions button:active{transform:scale(.98);}
+
+  /* 완료 팝업 */
+  .modal{position:fixed;inset:0;background:rgba(8,9,14,.72);display:flex;align-items:center;
+    justify-content:center;z-index:50;opacity:0;pointer-events:none;transition:opacity .2s;padding:24px;}
+  .modal.on{opacity:1;pointer-events:auto;}
+  .modal .box{background:linear-gradient(180deg,#1c2030,#13161f);border:1px solid #2a3040;
+    border-radius:22px;padding:26px 22px 20px;width:300px;max-width:100%;text-align:center;
+    transform:translateY(12px) scale(.96);transition:transform .2s;box-shadow:0 24px 60px rgba(0,0,0,.5);}
+  .modal.on .box{transform:none;}
+  .modal .mi{font-size:44px;}
+  .modal .mt{font-size:18px;font-weight:900;color:#fff;margin-top:8px;}
+  .modal .ms{font-size:12.5px;color:#9aa3b8;margin-top:8px;line-height:1.5;}
+  .modal .mb{margin-top:18px;background:#ffe600;color:#2a1d05;border:0;border-radius:12px;
+    padding:13px;width:100%;font-size:14px;font-weight:900;cursor:pointer;}
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="panel">
+      <div class="hero-t">🏆 우리 단톡, 진짜 <span class="y">빌런은 누구</span>일까?</div>
+      <div class="hero-s">카톡 .txt 하나 올리면 끝. <b style="color:#cfd6e6">내 단톡방</b>으로 바로 시상식 시작.</div>
+      <label class="b-file">📂 내 카톡 .txt 올리기<input id="file" type="file" accept=".txt,text/plain" hidden></label>
+      <div class="alt"><a id="paste-toggle">텍스트 붙여넣기</a> · <a href="guide.html">내보내는 법</a> · <a id="sample-link">예시 다시 보기</a></div>
+      <textarea id="raw" class="hide" placeholder="여기에 카톡 .txt 붙여넣기"></textarea>
+      <div class="note">🔒 전부 이 브라우저 안에서만 처리 · 서버 전송 0 · 닫으면 사라짐</div>
+      <button id="run" class="hide"></button>
+    </div>
+
+    <div id="out"></div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="box">
+      <div class="mi">🏆</div>
+      <div class="mt">분석 완료!</div>
+      <div class="ms" id="modal-sub">빌런 시상식 결과가 준비됐어요.</div>
+      <button class="mb" id="modal-ok">결과 보기 →</button>
+    </div>
+  </div>
+
+  <script src="parser.js" charset="utf-8"></script>
+  <script src="stats.js" charset="utf-8"></script>
+  <script src="ad.js" charset="utf-8"></script>
+  <script src="share.js" charset="utf-8"></script>
+  <script>
+    const $ = (s) => document.querySelector(s);
+
+    let curAnalysis = null, curRoom = "내 단톡방", curMode = "sample";
+
+    // mode: 'sample'(광고 예시) | 'mine'(내 결과)
+    function render(result, roomName, mode) {
+      const isSample = mode === "sample";
+      const a = result.awards;
+      const crowned = a.map((x, i) =>
+        `<div class="award ${i === 0 ? "crown" : ""}">
+           <div class="emoji">${x.emoji}</div>
+           <div class="a-main">
+             <div class="a-name">${x.key}</div>
+             <div class="a-person">${x.person}</div>
+             <div class="a-desc">${x.desc}</div>
+           </div>
+           <div class="a-stat">${x.stat}<small>${x.statLabel}</small></div>
+         </div>`).join("");
+      const chips = result.strip.map(c =>
+        `<div class="chip"><b>${c.v}</b><span>${c.label}</span></div>`).join("");
+      const r = result.meta.range;
+
+      const demoCta = isSample ? `
+        <div class="demo-cta">
+          <div class="dc-ic">👀</div>
+          <div class="dc-t"><b>이건 예시 리포트예요</b><span>내 카톡 올리면 진짜 우리 단톡 빌런이 나와요</span></div>
+          <button class="dc-btn" id="cta-up">내 거 분석 →</button>
+        </div>` : "";
+      const ribbon = isSample ? `<div class="ribbon">예시</div>` : "";
+      const badge = isSample
+        ? `<span class="badge">🏆 숨은 빌런 시상식</span>`
+        : `<span class="mine-badge">✅ 내 단톡 결과</span>`;
+      const roomLine = isSample
+        ? `💬 ${roomName} (예시) · 멤버 ${result.meta.participants.length}명`
+        : `💬 ${roomName} · 멤버 ${result.meta.participants.length}명`;
+
+      $("#out").innerHTML = `
+        ${demoCta}
+        <div class="card">
+          ${ribbon}
+          <div class="top">
+            ${badge}
+            <div class="title">${isSample ? "우리 단톡방<br>빌런 리포트" : "내 단톡방<br>빌런 리포트"}</div>
+            <div class="room">${roomLine}</div>
+            <div class="cmeta">분석 메시지 ${result.meta.count.toLocaleString()}개${r ? ` · ${r.from} ~ ${r.to}` : ""}</div>
+          </div>
+          <div class="cbody">
+            ${crowned}
+            <div class="strip">${chips}</div>
+            <div class="actions">
+              <button class="act-shuffle" id="reshuffle">🎲 다시 뽑기</button>
+              <button class="act-share" id="share">📤 결과 공유</button>
+            </div>
+          </div>
+          <div class="foot">
+            <div class="priv">🔒 대화는 서버에 안 올라갑니다 · 네 브라우저에서만 분석</div>
+            <div class="disc">※ 카톡 .txt엔 '읽음' 데이터가 없습니다. '읽씹왕'은 평균 답장속도 기반 추정,<br>먹튀·영업왕은 키워드 추정이라 재미용입니다.</div>
+          </div>
+        </div>`;
+      $("#reshuffle").onclick = () => render(KakaoStats.select(curAnalysis), roomName, mode);  // 재추첨(파싱 안 함)
+      $("#share").onclick = () => Share.villain(result, roomName);
+      const cu = $("#cta-up"); if (cu) cu.onclick = () => $("#file").click();
+    }
+
+    // 완료 팝업(내 결과일 때만) → 닫으면 결과로 포커스 이동
+    function showDone(awardCount) {
+      $("#modal-sub").textContent = `내 단톡에서 빌런 ${awardCount}명 색출 완료!`;
+      $("#modal").classList.add("on");
+    }
+    function closeDone() {
+      $("#modal").classList.remove("on");
+      const card = $("#out .card");
+      if (card) {
+        card.scrollIntoView({ behavior: "smooth", block: "start" });
+        card.setAttribute("tabindex", "-1");
+        card.focus({ preventScroll: true });
+      }
+    }
+    $("#modal-ok").onclick = closeDone;
+    $("#modal").onclick = (e) => { if (e.target === $("#modal")) closeDone(); };
+
+    function run(raw, roomName, mode) {
+      const parsed = KakaoParser.parseKakao(raw);
+      if (!parsed.count) { $("#out").innerHTML = '<div class="demo-cta"><div class="dc-ic">⚠</div><div class="dc-t"><b>메시지를 못 찾음</b><span>카톡 .txt 형식이 맞는지 확인해주세요</span></div></div>'; return; }
+      curRoom = roomName || "내 단톡방";
+      curMode = mode || "mine";
+      curAnalysis = KakaoStats.analyze(parsed);
+      const result = KakaoStats.select(curAnalysis);
+      if (curMode === "mine") {
+        // 내 결과 = 분석 중(10초) 광고 후 공개 + 완료 팝업
+        AdGate.run(10, "우리 단톡 분석 중").then(() => { render(result, curRoom, "mine"); showDone(result.awards.length); });
+      } else {
+        render(result, curRoom, "sample");   // 예시(광고)는 즉시
+      }
+    }
+
+    function runSample() {
+      const s = KakaoParser.sample();
+      run(s, "퇴근하고싶다 단톡", "sample");
+    }
+    $("#run").onclick = runSample;
+    $("#sample-link").onclick = runSample;
+    $("#paste-toggle").onclick = () => { $("#raw").classList.toggle("hide"); if (!$("#raw").classList.contains("hide")) $("#raw").focus(); };
+    $("#raw").addEventListener("input", (e) => { if (e.target.value.trim()) run(e.target.value, "내 단톡방", "mine"); });
+    $("#file").onchange = (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      const rd = new FileReader();
+      rd.onload = () => run(rd.result, f.name.replace(/\.txt$/i, ""), "mine");
+      rd.readAsText(f, "utf-8");
+    };
+
+    // index에서 업로드한 대화(sessionStorage)면 '내 결과', 없으면 '예시' 광고 자동 표시
+    (function init() {
+      const raw = sessionStorage.getItem("tkb_raw");
+      if (raw) run(raw, sessionStorage.getItem("tkb_name") || "내 단톡방", "mine");
+      else runSample();   // 들어오자마자 예시(광고)
+    })();
+  </script>
+</body>
+</html>

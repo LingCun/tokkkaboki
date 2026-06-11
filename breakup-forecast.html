@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>연인 예보 — 분석 (동작)</title>
+<style>
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:radial-gradient(900px 500px at 50% -10%,#241b2e,#0c0a12);
+    min-height:100vh; display:flex; flex-direction:column; align-items:center;
+    padding:26px 16px 50px; font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    color:#ede7f2;
+  }
+  .phone{width:380px; max-width:100%;}
+
+  /* input panel (hero) */
+  .panel{background:#161020;border:1px solid #312846;border-radius:18px;padding:18px 16px;margin-bottom:16px;}
+  .hero-t{font-size:18px;font-weight:900;color:#fff;line-height:1.3;}
+  .hero-t .p{background:linear-gradient(90deg,#c79bff,#ff7aa8);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .hero-s{font-size:12.5px;color:#9a8fb5;margin:7px 0 14px;line-height:1.5;}
+  .b-file{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;text-align:center;
+    background:linear-gradient(90deg,#7a4dff,#b04dff);color:#fff;border:0;border-radius:13px;
+    padding:15px;font-weight:900;font-size:14.5px;cursor:pointer;box-shadow:0 8px 22px rgba(140,77,255,.22);}
+  .b-file:active{transform:scale(.99);}
+  .alt{margin-top:11px;text-align:center;font-size:12px;color:#7c7490;}
+  .alt a{color:#b89bff;text-decoration:none;cursor:pointer;}
+  .alt a:hover{text-decoration:underline;}
+  textarea{width:100%;height:110px;background:#120d1f;border:1px solid #2a2140;border-radius:11px;
+    color:#b3a8c8;font-size:11px;padding:10px;font-family:ui-monospace,monospace;resize:vertical;margin-top:11px;}
+  .hide{display:none;}
+  .note{font-size:11px;color:#7c7490;margin-top:10px;line-height:1.5;text-align:center;}
+
+  /* 예시(광고) 배너 */
+  .demo-cta{background:linear-gradient(100deg,#2a1430,#1a0f24);border:1px solid #4a2247;border-radius:16px;
+    padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+  .demo-cta .dc-ic{font-size:26px;flex:none;}
+  .demo-cta .dc-t{flex:1;min-width:0;}
+  .demo-cta .dc-t b{display:block;font-size:13px;color:#ff8fb0;font-weight:900;}
+  .demo-cta .dc-t span{font-size:11.5px;color:#c09bb5;}
+  .demo-cta .dc-btn{flex:none;background:linear-gradient(90deg,#7a4dff,#b04dff);color:#fff;font-size:12.5px;
+    font-weight:900;padding:11px 14px;border:0;border-radius:11px;cursor:pointer;white-space:nowrap;}
+  .ribbon{position:absolute;top:13px;right:-34px;transform:rotate(45deg);background:#3a1430;color:#ff8fb0;
+    font-size:10.5px;font-weight:900;letter-spacing:.1em;padding:5px 38px;box-shadow:0 2px 8px rgba(0,0,0,.3);z-index:2;}
+  .mine-badge{display:inline-flex;align-items:center;gap:5px;background:#5a1f47;color:#ffd6ec;
+    font-size:11px;font-weight:900;letter-spacing:.04em;padding:5px 11px;border-radius:999px;}
+
+  .card{
+    position:relative;
+    background:linear-gradient(180deg,#1c1530,#161020);
+    border:1px solid #312846; border-radius:26px; overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,.55);
+  }
+  .top{padding:24px 22px 18px; text-align:center; background:linear-gradient(180deg,#2a1d3e,#1c1530);}
+  .kicker{font-size:11px; letter-spacing:.18em; color:#b89bff; font-weight:800;}
+  .wx{font-size:62px; margin:8px 0 2px; filter:drop-shadow(0 6px 16px rgba(140,90,255,.4));}
+  .alert{display:inline-block; background:#3a1430; color:#ff7aa8; font-weight:800;
+    font-size:12px; padding:6px 13px; border-radius:999px; margin-top:4px;}
+  .pair{margin-top:14px; font-size:14px; color:#cfc4e0;}
+  .pair b{color:#fff;}
+
+  .gauge{padding:22px 22px 6px; text-align:center;}
+  .gnum{font-size:54px; font-weight:900; line-height:1;
+    background:linear-gradient(90deg,#ff5a7a,#ff9a5a); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .glabel{font-size:13px; color:#b3a8c8; margin-top:4px;}
+  .glabel b{color:#ff6a8a;}
+  .bar{height:10px; border-radius:999px; margin:16px 4px 6px;
+    background:linear-gradient(90deg,#3ad07a,#f5c043 45%,#ff5a5f); position:relative;}
+  .bar .knob{position:absolute; top:-5px; width:20px; height:20px; border-radius:50%;
+    background:#fff; border:3px solid #ff5a5f; transform:translateX(-50%);
+    box-shadow:0 2px 10px rgba(0,0,0,.5);}
+  .bends{display:flex; justify-content:space-between; font-size:10px; color:#8a7fa6; padding:0 4px;}
+
+  .sec{padding:16px 20px 4px;}
+  .sec h3{font-size:12px; color:#b89bff; letter-spacing:.04em; margin-bottom:8px;}
+  .chartwrap{background:#120d1f; border:1px solid #2a2140; border-radius:16px; padding:14px 10px 6px;}
+  .legend{display:flex; gap:6px; align-items:center; font-size:11px; color:#cfc4e0; margin:8px 4px 0;}
+  .dot{width:8px;height:8px;border-radius:50%;background:#ff6a8a;display:inline-block;}
+
+  .signals{padding:14px 20px 6px;}
+  .sig{display:flex; align-items:center; gap:11px; padding:11px 0; border-bottom:1px solid #241b38;}
+  .sig:last-child{border-bottom:0;}
+  .sig .ic{font-size:20px; width:34px; text-align:center;}
+  .sig .t{flex:1;}
+  .sig .t b{font-size:13.5px; color:#f2ecfa;}
+  .sig .t span{display:block; font-size:11px; color:#9a8fb5; margin-top:2px;}
+  .sig .v{font-size:13px; font-weight:800;}
+  .down{color:#ff6a8a;} .up{color:#5fd08a;}
+
+  .verdict{margin:8px 20px 0; background:#241433; border:1px solid #4a2247;
+    border-radius:16px; padding:14px 16px; font-size:13px; line-height:1.55; color:#f0d7e6;}
+  .verdict b{color:#ff8fb0;}
+
+  .lock{margin:14px 20px 0; background:#160f24; border:1px dashed #4a3a6a;
+    border-radius:16px; padding:16px; text-align:center;}
+  .lock .lt{font-size:13px; font-weight:800; color:#d9ccff;}
+  .lock .ls{font-size:11px; color:#8a7fa6; margin-top:4px;}
+  .lock .lb{display:inline-block; margin-top:12px; background:linear-gradient(90deg,#7a4dff,#b04dff);
+    color:#fff; font-weight:900; font-size:13px; padding:12px 24px; border-radius:999px; cursor:pointer;}
+  .blur{filter:blur(5px); opacity:.5; pointer-events:none;}
+
+  .foot{padding:16px 20px 22px; text-align:center;}
+  .brand{font-size:11px; color:#6f6688; letter-spacing:.06em;}
+  .priv{font-size:10px; color:#544c6b; margin-top:4px;}
+  .disc{font-size:10px; color:#4a4360; margin-top:8px; line-height:1.5;}
+  .err{padding:30px 20px;text-align:center;color:#ff9ab0;font-size:13px;line-height:1.6;}
+  .persona{margin-top:8px; font-size:14px; font-weight:800; color:#e6d4ff;}
+  .actions{display:flex; gap:8px; margin:12px 20px 0;}
+  .actions button{flex:1; border-radius:999px; padding:12px; font-size:12.5px; font-weight:900; cursor:pointer; border:1px solid #3a2c54;}
+  .act-shuffle{background:#160f24; color:#c79bff;}
+  .act-share{background:linear-gradient(90deg,#7a4dff,#b04dff); color:#fff; border:0;}
+  .actions button:active{transform:scale(.98);}
+  .modal{position:fixed; inset:0; background:rgba(8,6,14,.74); display:flex; align-items:center;
+    justify-content:center; z-index:50; opacity:0; pointer-events:none; transition:opacity .2s; padding:24px;}
+  .modal.on{opacity:1; pointer-events:auto;}
+  .modal .box{background:linear-gradient(180deg,#241a36,#170f24); border:1px solid #3a2c54;
+    border-radius:22px; padding:26px 22px 20px; width:300px; max-width:100%; text-align:center;
+    transform:translateY(12px) scale(.96); transition:transform .2s; box-shadow:0 24px 60px rgba(0,0,0,.55);}
+  .modal.on .box{transform:none;}
+  .modal .mi{font-size:44px;}
+  .modal .mt{font-size:18px; font-weight:900; color:#fff; margin-top:8px;}
+  .modal .ms{font-size:12.5px; color:#b3a8c8; margin-top:8px; line-height:1.5;}
+  .modal .mb{margin-top:18px; background:linear-gradient(90deg,#7a4dff,#b04dff); color:#fff; border:0;
+    border-radius:12px; padding:13px; width:100%; font-size:14px; font-weight:900; cursor:pointer;}
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="panel">
+      <div class="hero-t">🌧️ 우리, 지금 <span class="p">몇 도</span>일까?</div>
+      <div class="hero-s">연인과의 1:1 카톡 .txt 올리면 <b style="color:#cfc4e0">우리 관계</b> 애정온도·연인 예보를 봐요.</div>
+      <label class="b-file">📂 우리 대화 .txt 올리기<input id="file" type="file" accept=".txt,text/plain" hidden></label>
+      <div class="alt"><a id="paste-toggle">텍스트 붙여넣기</a> · <a href="guide.html">내보내는 법</a> · <a id="sample-link">예시 다시 보기</a></div>
+      <textarea id="raw" class="hide" placeholder="여기에 1:1 카톡 .txt 붙여넣기"></textarea>
+      <div class="note">🔒 전부 이 브라우저 안에서만 처리 · 서버 전송 0 · 닫으면 사라짐 · 혼자만 봐요</div>
+      <button id="run" class="hide"></button>
+    </div>
+
+    <div id="out"></div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="box">
+      <div class="mi">🔮</div>
+      <div class="mt">분석 완료!</div>
+      <div class="ms" id="modal-sub">관계 일기예보가 준비됐어요.</div>
+      <button class="mb" id="modal-ok">예보 보기 →</button>
+    </div>
+  </div>
+
+  <script src="parser.js" charset="utf-8"></script>
+  <script src="breakup-stats.js" charset="utf-8"></script>
+  <script src="ad.js" charset="utf-8"></script>
+  <script src="share.js" charset="utf-8"></script>
+  <script>
+    const $ = (s) => document.querySelector(s);
+
+    // 온기 추세 → SVG path
+    function trendSVG(trend) {
+      if (trend.length < 2) return '<div class="legend">추세 그릴 데이터 부족 (월 2개 이상 필요)</div>';
+      const W = 320, H = 120, pad = 6;
+      const xs = (i) => pad + (W - 2*pad) * i / (trend.length - 1);
+      const ys = (w) => H - 18 - (H - 30) * (w / 100);   // warmth 0~100 → y
+      const pts = trend.map((t, i) => [xs(i), ys(t.warmth)]);
+      const line = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(0) + "," + p[1].toFixed(0)).join(" ");
+      const area = line + ` L${W-pad},${H} L${pad},${H} Z`;
+      const last = pts[pts.length - 1];
+      const lo = trend[0].warmth, hi = trend[trend.length-1].warmth;
+      const mo = (k) => +k.slice(5) + "월";
+      return `
+        <svg viewBox="0 0 ${W} ${H}" width="100%" height="120">
+          <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#ff6a8a" stop-opacity=".35"/>
+            <stop offset="1" stop-color="#ff6a8a" stop-opacity="0"/>
+          </linearGradient></defs>
+          <line x1="0" y1="30" x2="${W}" y2="30" stroke="#241b38"/>
+          <line x1="0" y1="60" x2="${W}" y2="60" stroke="#241b38"/>
+          <line x1="0" y1="90" x2="${W}" y2="90" stroke="#241b38"/>
+          <path d="${area}" fill="url(#g)"/>
+          <path d="${line}" fill="none" stroke="#ff6a8a" stroke-width="3" stroke-linejoin="round"/>
+          <circle cx="${last[0].toFixed(0)}" cy="${last[1].toFixed(0)}" r="5" fill="#fff" stroke="#ff5a5f" stroke-width="3"/>
+        </svg>
+        <div class="legend"><span class="dot"></span> ${mo(trend[0].month)} 온기 ${lo}% → ${mo(trend[trend.length-1].month)} ${hi}%. ${lo>hi?"하강 곡선.":"유지/회복."}</div>`;
+    }
+
+    function render(r, mode) {
+      if (r.error) { $("#out").innerHTML = `<div class="card"><div class="err">${r.error}</div></div>`; return; }
+      const isSample = mode === "sample";
+      const sigs = r.signals.map(s =>
+        `<div class="sig">
+           <div class="ic">${s.ic}</div>
+           <div class="t"><b>${s.t}</b><span>${s.sub}</span></div>
+           <div class="v ${s.down?"down":"up"}">${s.v}${s.down?" ↓":""}</div>
+         </div>`).join("");
+      const rg = r.meta.range;
+      const ribbon = isSample ? `<div class="ribbon">예시</div>` : "";
+      const kicker = isSample
+        ? `<div class="kicker">관계 일기예보 · 예시</div>`
+        : `<span class="mine-badge">💜 우리 관계 예보</span>`;
+      $("#out").innerHTML = `
+        <div class="card">
+          ${ribbon}
+          <div class="top">
+            ${kicker}
+            <div class="wx">${r.wx}</div>
+            <span class="alert">${r.alert}</span>
+            <div class="persona">${r.persona}</div>
+            <div class="pair"><b>${r.pair.a}</b> 💬 <b>${r.pair.b}</b>${rg?` · ${rg.from} ~ ${rg.to}`:""}</div>
+          </div>
+
+          <div class="gauge">
+            <div class="gnum">${r.temp}%</div>
+            <div class="glabel">${r.state}${r.deltaTxt?` · <b>${r.deltaTxt}</b>`:""}</div>
+            <div class="bar"><div class="knob" style="left:${Math.min(98,Math.max(2,r.temp))}%"></div></div>
+            <div class="bends"><span>☀️ 맑음</span><span>⛅ 미지근</span><span>🌨️ 한파</span></div>
+          </div>
+
+          <div class="sec">
+            <h3>📉 애정 온도 추세 (월별)</h3>
+            <div class="chartwrap">${trendSVG(r.trend)}</div>
+          </div>
+
+          <div class="signals">${sigs}</div>
+
+          <div class="verdict">🔮 <b>예보:</b> ${r.verdict}</div>
+          <div class="actions">
+            <button class="act-shuffle" id="reshuffle">🎲 다른 코멘트</button>
+            <button class="act-share" id="share">📤 결과 공유</button>
+          </div>
+
+          <div class="foot">
+            <div class="brand">연인 예보 · 관계 일기예보</div>
+            <div class="priv">🔒 대화는 서버에 안 올라갑니다 · 네 폰에서만 분석</div>
+            <div class="disc">※ 카톡 .txt엔 '읽음'·감정 데이터가 없습니다. '애정온도'는 답장속도·먼저연락·ㅋ길이·빈도를<br>가중합한 추정 점수라 재미용입니다.</div>
+          </div>
+        </div>`;
+      const rs = $("#reshuffle");
+      if (rs) rs.onclick = () => render(Object.assign({}, curResult, BreakupStats.flavor(curResult)), mode);  // 온도 고정, 코멘트만 변형
+      const sh = $("#share"); if (sh) sh.onclick = () => Share.breakup(r);
+      const cu = $("#cta-up"); if (cu) cu.onclick = () => $("#file").click();
+    }
+
+    let curResult = null, curMode = "sample";
+
+    function run(raw, mode) {
+      const parsed = KakaoParser.parseKakao(raw);
+      if (!parsed.count) { render({ error: "메시지를 못 찾음. 카톡 .txt 형식 맞는지 확인." }); return; }
+      curResult = BreakupStats.analyze(parsed);
+      curMode = mode || "mine";
+      if (curResult.error) { render(curResult, curMode); return; }
+      if (curMode === "mine") {
+        // 내 결과 = 분석 중(10초) 광고 후 공개 + 완료 팝업
+        AdGate.run(10, "우리 관계 분석 중").then(() => { render(curResult, "mine"); showDone(); });
+      } else {
+        render(curResult, "sample");   // 예시(광고)는 즉시
+      }
+    }
+
+    // 완료 팝업(내 결과) → 닫으면 결과로 포커스 이동
+    function showDone() {
+      $("#modal-sub").textContent = `우리 애정온도 ${curResult.temp}% · 예보가 준비됐어요.`;
+      $("#modal").classList.add("on");
+    }
+    function closeDone() {
+      $("#modal").classList.remove("on");
+      const card = $("#out .card");
+      if (card) {
+        card.scrollIntoView({ behavior: "smooth", block: "start" });
+        card.setAttribute("tabindex", "-1");
+        card.focus({ preventScroll: true });
+      }
+    }
+    $("#modal-ok").onclick = closeDone;
+    $("#modal").onclick = (e) => { if (e.target === $("#modal")) closeDone(); };
+
+    function runSample() { run(BreakupStats.sample(), "sample"); }
+    $("#run").onclick = runSample;
+    $("#sample-link").onclick = runSample;
+    $("#paste-toggle").onclick = () => { $("#raw").classList.toggle("hide"); if (!$("#raw").classList.contains("hide")) $("#raw").focus(); };
+    $("#raw").addEventListener("input", (e) => { if (e.target.value.trim()) run(e.target.value, "mine"); });
+    $("#file").onchange = (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      const rd = new FileReader();
+      rd.onload = () => run(rd.result, "mine");
+      rd.readAsText(f, "utf-8");
+    };
+
+    // index에서 업로드한 대화(sessionStorage)면 '내 결과', 없으면 '예시' 광고 자동 표시
+    (function init() {
+      const raw = sessionStorage.getItem("tkb_raw");
+      if (raw) run(raw, "mine");
+      else runSample();   // 들어오자마자 예시(광고)
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>톡까보기 — 대화 내보내기 방법</title>
+<style>
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:radial-gradient(800px 500px at 50% -8%,#1d2230,#0c0d12);
+    min-height:100vh; display:flex; justify-content:center; align-items:flex-start;
+    padding:22px 16px 50px; font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    color:#eef1f7;
+  }
+  .phone{width:380px; max-width:100%;}
+  .back{display:inline-block; font-size:13px; color:#9aa3b8; text-decoration:none; margin-bottom:14px;}
+  .head{text-align:center; margin-bottom:18px;}
+  .head .t{font-size:21px; font-weight:900;}
+  .head .s{font-size:12.5px; color:#9aa3b8; margin-top:6px; line-height:1.5;}
+  .head .x{background:linear-gradient(90deg,#ffe600,#ff7aa8); -webkit-background-clip:text; background-clip:text; color:transparent;}
+
+  .tabs{display:flex; gap:6px; background:#161922; border:1px solid #2a3040; border-radius:14px; padding:5px; margin-bottom:16px;}
+  .tab{flex:1; text-align:center; padding:10px 4px; border-radius:10px; font-size:13px; font-weight:800;
+    color:#9aa3b8; cursor:pointer; transition:.12s;}
+  .tab.on{background:#2a3040; color:#ffe600;}
+
+  .panel{background:#161922; border:1px solid #2a3040; border-radius:18px; padding:18px 16px; display:none;}
+  .panel.on{display:block;}
+  .panel h3{font-size:14px; color:#e7ebf4; margin-bottom:4px;}
+  .panel .meta{font-size:11.5px; color:#7f879b; margin-bottom:14px;}
+
+  .step{display:flex; gap:12px; padding:11px 0; border-bottom:1px solid #232a38;}
+  .step:last-of-type{border-bottom:0;}
+  .step .n{flex:none; width:26px; height:26px; border-radius:50%; background:#2a3040; color:#ffd84d;
+    font-size:13px; font-weight:900; display:flex; align-items:center; justify-content:center;}
+  .step .c{flex:1; font-size:13.5px; line-height:1.5; color:#dfe4ee;}
+  .step .c b{color:#fff;}
+  .step .c em{font-style:normal; background:#23304a; color:#bcd0ff; padding:1px 6px; border-radius:6px; font-size:12.5px;}
+
+  .tip{margin-top:14px; background:#13201a; border:1px solid #1d4a32; border-radius:12px;
+    padding:11px 13px; font-size:12px; color:#9fe3bd; line-height:1.55;}
+  .warn{margin-top:10px; background:#201a13; border:1px solid #4a3a1d; border-radius:12px;
+    padding:11px 13px; font-size:12px; color:#e3cf9f; line-height:1.55;}
+
+  .cta{display:block; text-align:center; text-decoration:none; margin-top:20px;
+    background:linear-gradient(90deg,#ffe600,#ff7aa8); color:#1a1206; font-weight:900;
+    font-size:14px; padding:14px; border-radius:14px;}
+  .priv{margin-top:16px; text-align:center; font-size:11px; color:#646c80; line-height:1.6;}
+  .priv b{color:#8b93a7;}
+</style>
+</head>
+<body>
+  <div class="phone">
+    <a class="back" href="index.html">← 톡까보기 홈</a>
+    <div class="head">
+      <div class="t">카톡 대화 <span class="x">내보내기</span> 방법</div>
+      <div class="s">기기에서 대화를 <b>.txt 파일</b>로 저장 → 톡까보기에 올리면 끝.<br>설치 앱 없음 · 로그인 없음.</div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab on" data-t="pc">💻 PC</div>
+      <div class="tab" data-t="ios">📱 아이폰</div>
+      <div class="tab" data-t="and">🤖 안드로이드</div>
+    </div>
+
+    <!-- PC -->
+    <div class="panel on" id="pc">
+      <h3>💻 PC (윈도우 · 맥)</h3>
+      <div class="meta">카카오톡 PC 앱 기준 · 단톡방 분석은 PC가 제일 편함</div>
+      <div class="step"><div class="n">1</div><div class="c">분석할 <b>채팅방을 연다</b></div></div>
+      <div class="step"><div class="n">2</div><div class="c">채팅방 안에서 <em>Ctrl + S</em> 누르기<br><span style="color:#8a93a7;font-size:12px;">(또는 채팅방 우측 위 <b>메뉴 ☰</b> → <em>대화 내용</em>)</span></div></div>
+      <div class="step"><div class="n">3</div><div class="c"><b>대화 내보내기 / 저장</b> 선택</div></div>
+      <div class="step"><div class="n">4</div><div class="c">저장 위치 정하고 <b>.txt로 저장</b> (바탕화면 추천)</div></div>
+      <div class="step"><div class="n">5</div><div class="c">톡까보기에서 <b>그 .txt를 올리기</b> (또는 끌어다 놓기)</div></div>
+      <div class="tip">💡 PC는 파일을 <b>끌어다 놓기(드래그&드롭)</b>만 해도 바로 분석됩니다.</div>
+    </div>
+
+    <!-- iOS -->
+    <div class="panel" id="ios">
+      <h3>📱 아이폰 (iOS)</h3>
+      <div class="meta">카카오톡 앱 → 공유 시트 → 파일 앱 저장</div>
+      <div class="step"><div class="n">1</div><div class="c">분석할 <b>채팅방을 연다</b></div></div>
+      <div class="step"><div class="n">2</div><div class="c">우측 위 <b>메뉴 ☰</b> → 우측 아래 <b>설정 ⚙</b></div></div>
+      <div class="step"><div class="n">3</div><div class="c"><b>대화 내용 내보내기</b> 누르기</div></div>
+      <div class="step"><div class="n">4</div><div class="c"><b>텍스트만</b> 내보내기 선택</div></div>
+      <div class="step"><div class="n">5</div><div class="c">공유 창에서 <em>파일에 저장</em> 선택 → <b>.txt 저장</b></div></div>
+      <div class="step"><div class="n">6</div><div class="c">톡까보기에서 <b>파일 선택 → 방금 그 .txt</b> 고르기</div></div>
+      <div class="tip">💡 메일/카톡 나에게 보내기로 옮겨도 됩니다. 핵심은 <b>.txt 파일 하나</b> 확보.</div>
+    </div>
+
+    <!-- Android -->
+    <div class="panel" id="and">
+      <h3>🤖 안드로이드</h3>
+      <div class="meta">카카오톡 앱 → 내부 저장소 .txt</div>
+      <div class="step"><div class="n">1</div><div class="c">분석할 <b>채팅방을 연다</b></div></div>
+      <div class="step"><div class="n">2</div><div class="c">우측 위 <b>메뉴 ☰</b> → 우측 아래 <b>설정 ⚙</b></div></div>
+      <div class="step"><div class="n">3</div><div class="c"><b>대화 내용 내보내기</b> 누르기</div></div>
+      <div class="step"><div class="n">4</div><div class="c"><b>텍스트 메시지만 보내기</b> 선택</div></div>
+      <div class="step"><div class="n">5</div><div class="c">저장 앱(<em>내 파일</em>·드라이브) 고르거나 <b>나에게 메일</b>로 보내기</div></div>
+      <div class="step"><div class="n">6</div><div class="c">톡까보기에서 <b>파일 선택 → 그 .txt</b> 고르기<br><span style="color:#8a93a7;font-size:12px;">보통 <em>내 파일 → Download</em> 또는 <em>KakaoTalk/Chats</em> 폴더</span></div></div>
+      <div class="warn">⚠ 기종·버전에 따라 메뉴 이름이 조금 다를 수 있어요. <b>"내보내기 → 텍스트"</b>만 찾으면 됩니다.</div>
+    </div>
+
+    <a class="cta" href="index.html">올릴 .txt 준비됐어요 · 분석하러 가기 →</a>
+    <div class="priv">🔒 <b>대화는 서버에 안 올라갑니다.</b> 네 기기 안에서만 분석하고 끝나면 사라집니다.</div>
+  </div>
+
+  <script>
+    document.querySelectorAll(".tab").forEach(t => {
+      t.onclick = () => {
+        document.querySelectorAll(".tab").forEach(x => x.classList.remove("on"));
+        document.querySelectorAll(".panel").forEach(x => x.classList.remove("on"));
+        t.classList.add("on");
+        document.getElementById(t.dataset.t).classList.add("on");
+      };
+    });
+    // 모바일이면 해당 탭 자동 선택
+    (function autoTab() {
+      const ua = navigator.userAgent;
+      let t = null;
+      if (/iPhone|iPad|iPod/i.test(ua)) t = "ios";
+      else if (/Android/i.test(ua)) t = "and";
+      if (t) document.querySelector(`.tab[data-t="${t}"]`).click();
+    })();
+  </script>
+</body>
+</html>

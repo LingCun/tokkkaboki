@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>모임 빌런 리포트 — 목업</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#fffdf5; --ink:#1d1b16; --sub:#6b6457;
+    --kakao:#ffe600; --kakao2:#3b1e1e; --accent:#ff5a5f; --gold:#f5b301;
+    --line:#ece6d6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:radial-gradient(1200px 600px at 50% -10%,#1b2030,#0f1115);
+    min-height:100vh; display:flex; justify-content:center; align-items:flex-start;
+    padding:32px 16px; font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    color:var(--ink);
+  }
+  .phone{width:380px; max-width:100%;}
+  .hint{color:#8b93a7; font-size:12px; text-align:center; margin-bottom:14px; letter-spacing:.02em;}
+
+  /* shareable card */
+  .card{
+    background:var(--card); border-radius:26px; overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,.45), 0 2px 0 rgba(255,255,255,.6) inset;
+  }
+  .top{
+    background:linear-gradient(135deg,#ffe600,#ffd000);
+    padding:22px 22px 18px; position:relative;
+  }
+  .badge{display:inline-block; background:var(--kakao2); color:#ffe600;
+    font-size:11px; font-weight:800; letter-spacing:.08em; padding:5px 10px; border-radius:999px;}
+  .title{margin-top:12px; font-size:23px; font-weight:900; color:#2a1d05; line-height:1.25;}
+  .room{margin-top:6px; font-size:13px; color:#6b5300; font-weight:700;}
+  .meta{margin-top:2px; font-size:11px; color:#8a7300;}
+
+  .body{padding:18px 18px 8px;}
+
+  /* award rows */
+  .award{display:flex; gap:13px; align-items:center; padding:14px 12px;
+    border:1px solid var(--line); border-radius:16px; margin-bottom:11px; background:#fff;}
+  .award.crown{border-color:#f7d774; background:linear-gradient(180deg,#fffaf0,#fff);}
+  .emoji{font-size:30px; width:46px; height:46px; display:flex; align-items:center;
+    justify-content:center; background:#fbf7ec; border-radius:13px; flex:none;}
+  .a-main{flex:1; min-width:0;}
+  .a-name{font-size:11px; color:var(--accent); font-weight:800; letter-spacing:.03em;}
+  .a-person{font-size:17px; font-weight:900; margin-top:1px;}
+  .a-desc{font-size:12px; color:var(--sub); margin-top:3px; line-height:1.4;}
+  .a-stat{font-size:20px; font-weight:900; color:#2a1d05; text-align:right; flex:none;}
+  .a-stat small{display:block; font-size:10px; color:var(--sub); font-weight:700;}
+
+  /* stat strip */
+  .strip{display:flex; gap:8px; padding:6px 6px 2px;}
+  .chip{flex:1; background:#f6f2e7; border-radius:13px; padding:11px 8px; text-align:center;}
+  .chip b{display:block; font-size:18px; color:#2a1d05;}
+  .chip span{font-size:10px; color:var(--sub);}
+
+  .sec-label{font-size:12px; font-weight:800; color:var(--sub); margin:6px 4px 10px;}
+  .mini{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:6px;}
+  .m{display:flex; align-items:center; gap:9px; background:#faf6ec;
+    border:1px solid var(--line); border-radius:12px; padding:9px 10px;}
+  .m .me{font-size:19px;}
+  .m b{font-size:12.5px; display:block;}
+  .m i{font-size:11px; color:var(--sub); font-style:normal;}
+
+  .footer{padding:14px 18px 20px; text-align:center;}
+  .cta{display:inline-block; background:var(--kakao2); color:#ffe600; font-weight:900;
+    font-size:13px; padding:12px 22px; border-radius:999px; letter-spacing:.02em;}
+  .brand{margin-top:12px; font-size:11px; color:#a99; letter-spacing:.06em;}
+  .privacy{margin-top:4px; font-size:10px; color:#bbb1a0;}
+
+  .share{display:flex; gap:8px; margin-top:14px;}
+  .share button{flex:1; border:0; padding:13px; border-radius:14px; font-weight:800;
+    font-size:13px; cursor:pointer;}
+  .share .kk{background:var(--kakao); color:#3b1e1e;}
+  .share .sv{background:#2a2f3a; color:#fff;}
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="hint">↓ 단톡방에 공유되는 결과 카드 (목업 · 가짜 데이터)</div>
+
+    <div class="card">
+      <div class="top">
+        <span class="badge">🏆 2026 상반기 빌런 시상식</span>
+        <div class="title">우리 단톡방<br>숨은 빌런 리포트</div>
+        <div class="room">💬 "퇴근하고싶다" · 멤버 6명</div>
+        <div class="meta">분석 메시지 12,847개 · 2026.01.01 ~ 06.10</div>
+      </div>
+
+      <div class="body">
+        <div class="award crown">
+          <div class="emoji">👻</div>
+          <div class="a-main">
+            <div class="a-name">읽씹왕 (RADO)</div>
+            <div class="a-person">김민준</div>
+            <div class="a-desc">평균 답장 <b>7시간 18분</b>. 읽고 째기 214회</div>
+          </div>
+          <div class="a-stat">214<small>읽씹</small></div>
+        </div>
+
+        <div class="award">
+          <div class="emoji">🏧</div>
+          <div class="a-main">
+            <div class="a-name">ATM (먹튀 의혹)</div>
+            <div class="a-person">이서연</div>
+            <div class="a-desc">"내가 쏠게" 0회 · "다음에~" 17회</div>
+          </div>
+          <div class="a-stat">0<small>쏜 횟수</small></div>
+        </div>
+
+        <div class="award">
+          <div class="emoji">🌙</div>
+          <div class="a-main">
+            <div class="a-name">새벽감성러</div>
+            <div class="a-person">박도윤</div>
+            <div class="a-desc">새벽 2~4시 폭격 89회 · 다음날 다 삭제</div>
+          </div>
+          <div class="a-stat">89<small>새벽톡</small></div>
+        </div>
+
+        <div class="award">
+          <div class="emoji">🤿</div>
+          <div class="a-main">
+            <div class="a-name">잠수왕</div>
+            <div class="a-person">최지우</div>
+            <div class="a-desc">최장 잠수 <b>23일</b> · 약속잡기만 하면 증발</div>
+          </div>
+          <div class="a-stat">23일<small>최장잠수</small></div>
+        </div>
+
+        <div class="award">
+          <div class="emoji">📢</div>
+          <div class="a-main">
+            <div class="a-name">도배왕</div>
+            <div class="a-person">강하준</div>
+            <div class="a-desc">전체 메시지 <b>31%</b> 혼자 작성 · 1줄씩 9연타</div>
+          </div>
+          <div class="a-stat">3,9k<small>메시지</small></div>
+        </div>
+
+        <div class="award">
+          <div class="emoji">🤖</div>
+          <div class="a-main">
+            <div class="a-name">영업왕 (수상함)</div>
+            <div class="a-person">정유나</div>
+            <div class="a-desc">"좋은 기회가" "디엠줘" 등장 → 슬슬 거리두기 각</div>
+          </div>
+          <div class="a-stat">14<small>권유</small></div>
+        </div>
+
+        <div class="sec-label">🎖 기타 수상</div>
+        <div class="mini">
+          <div class="m"><span class="me">😐</span><div><b>정색러</b><i>김민준</i></div></div>
+          <div class="m"><span class="me">📸</span><div><b>캡처범</b><i>이서연</i></div></div>
+          <div class="m"><span class="me">🗯</span><div><b>TMI왕</b><i>박도윤</i></div></div>
+          <div class="m"><span class="me">🃏</span><div><b>답정너</b><i>최지우</i></div></div>
+          <div class="m"><span class="me">🥳</span><div><b>분위기메이커</b><i>강하준</i></div></div>
+          <div class="m"><span class="me">👤</span><div><b>투명인간</b><i>정유나</i></div></div>
+          <div class="m"><span class="me">🔥</span><div><b>화력지원</b><i>김민준</i></div></div>
+          <div class="m"><span class="me">🐢</span><div><b>느림보</b><i>최지우</i></div></div>
+        </div>
+
+        <div class="strip">
+          <div class="chip"><b>23:47</b><span>가장 활발<br>한 시간</span></div>
+          <div class="chip"><b>ㅋㅋㅋ</b><span>최다 단어<br>3,201회</span></div>
+          <div class="chip"><b>금요일</b><span>제일 시끄<br>러운 요일</span></div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span class="cta">내 단톡방도 분석하기 →</span>
+        <div class="brand">단톡 빌런 리포트</div>
+        <div class="privacy">🔒 대화는 서버에 안 올라갑니다 · 네 폰에서만 분석</div>
+      </div>
+    </div>
+
+    <div class="share">
+      <button class="kk">카톡으로 공유</button>
+      <button class="sv">이미지 저장</button>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>톡까보기 — 카톡 대화 분석</title>
+<style>
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:radial-gradient(800px 500px at 50% -8%,#1d2230,#0c0d12);
+    min-height:100vh; display:flex; justify-content:center; align-items:flex-start;
+    padding:26px 16px 40px; font-family:"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+    color:#eef1f7;
+  }
+  .phone{width:380px; max-width:100%;}
+
+  .brand{text-align:center; margin:10px 0 22px;}
+  .logo{font-size:27px; font-weight:900; letter-spacing:-.01em;}
+  .logo .x{background:linear-gradient(90deg,#ffe600,#ff7aa8); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .tag{margin-top:7px; font-size:13px; color:#9aa3b8;}
+  .tag b{color:#cfd6e6;}
+
+  .upload{
+    background:#161922; border:1px dashed #343b4d; border-radius:16px;
+    padding:14px 16px; display:flex; align-items:center; gap:12px; margin-bottom:10px; cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .upload:hover{border-color:#4a5266;}
+  .upload.ready{border-style:solid; border-color:#3ad07a; background:#13201a;}
+  .upload .ic{font-size:22px;}
+  .upload .u-t{flex:1; min-width:0;}
+  .upload .u-t b{font-size:13px; color:#e7ebf4; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .upload .u-t span{font-size:11px; color:#7f879b;}
+  .upload .u-btn{background:#2a3040; color:#cfd6e6; font-size:12px; font-weight:800;
+    padding:9px 13px; border-radius:10px; white-space:nowrap;}
+  .upload.ready .u-btn{background:#1d4a32; color:#7ee6a8;}
+
+  .detect{font-size:11.5px; color:#9aa3b8; margin:2px 4px 0; min-height:16px; line-height:1.5;}
+  .detect b{color:#cfd6e6;}
+  .detect .rec{color:#ffd84d; font-weight:800;}
+  .guide-link{display:inline-block; margin:8px 4px 0; font-size:12px; color:#7aa2ff; text-decoration:none;}
+  .guide-link:hover{text-decoration:underline;}
+  .upload.drag{border-style:solid; border-color:#7aa2ff; background:#141a28;}
+
+  .pick-label{font-size:12px; color:#7f879b; margin:18px 4px 12px; font-weight:700; letter-spacing:.03em;}
+
+  .mode{display:block; text-decoration:none; color:inherit; border-radius:22px;
+    padding:20px; margin-bottom:14px; position:relative; overflow:hidden;
+    border:1px solid rgba(255,255,255,.07); transition:transform .12s; cursor:pointer;}
+  .mode:active{transform:scale(.985);}
+  .mode.villain{background:linear-gradient(135deg,#3a3208,#211c06);}
+  .mode.villain::before{content:""; position:absolute; inset:0;
+    background:radial-gradient(300px 160px at 100% 0,rgba(255,230,0,.22),transparent);}
+  .mode.love{background:linear-gradient(135deg,#2c1430,#1a0f24);}
+  .mode.love::before{content:""; position:absolute; inset:0;
+    background:radial-gradient(300px 160px at 100% 0,rgba(176,77,255,.25),transparent);}
+  .mode.reco{box-shadow:0 0 0 2px rgba(255,216,77,.5), 0 8px 24px rgba(0,0,0,.3);}
+  .mode.love.reco{box-shadow:0 0 0 2px rgba(199,155,255,.55), 0 8px 24px rgba(0,0,0,.3);}
+
+  .m-row{display:flex; align-items:center; gap:14px; position:relative;}
+  .m-emoji{font-size:40px; width:62px; height:62px; flex:none; border-radius:16px;
+    display:flex; align-items:center; justify-content:center;}
+  .villain .m-emoji{background:rgba(255,230,0,.12);}
+  .love .m-emoji{background:rgba(176,77,255,.14);}
+  .m-main{flex:1; min-width:0;}
+  .m-kicker{font-size:11px; font-weight:800; letter-spacing:.04em;}
+  .villain .m-kicker{color:#ffd84d;}
+  .love .m-kicker{color:#c79bff;}
+  .m-title{font-size:19px; font-weight:900; margin-top:2px;}
+  .m-desc{font-size:12px; color:#aab2c5; margin-top:5px; line-height:1.45;}
+  .m-foot{display:flex; align-items:center; justify-content:space-between;
+    margin-top:14px; position:relative;}
+  .m-tags{display:flex; gap:6px; flex-wrap:wrap;}
+  .m-tags span{font-size:10.5px; padding:4px 8px; border-radius:999px;
+    background:rgba(255,255,255,.07); color:#c2c9d8;}
+  .m-go{font-size:13px; font-weight:900;}
+  .villain .m-go{color:#ffd84d;} .love .m-go{color:#c79bff;}
+  .price{position:absolute; top:16px; right:16px; font-size:11px; font-weight:800;
+    padding:5px 10px; border-radius:999px;}
+  .villain .price{background:rgba(255,230,0,.15); color:#ffe600;}
+  .love .price{background:rgba(176,77,255,.18); color:#d9b3ff;}
+
+  .privacy{margin-top:18px; text-align:center; font-size:11px; color:#646c80; line-height:1.6;}
+  .privacy b{color:#8b93a7;}
+  .count{margin-top:14px; text-align:center; font-size:11px; color:#7f879b;}
+  .count b{color:#cfd6e6;}
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="brand">
+      <div class="logo">톡<span class="x">까보기</span></div>
+      <div class="tag">카톡 대화 <b>.txt 하나</b>면 끝. 무슨 일이 있었는지 까봅니다.</div>
+    </div>
+
+    <div class="upload" id="up">
+      <div class="ic" id="up-ic">📂</div>
+      <div class="u-t">
+        <b id="up-title">카톡 대화 내보내기 업로드</b>
+        <span id="up-sub">채팅방 → 메뉴 → 대화 내보내기(.txt)</span>
+      </div>
+      <div class="u-btn" id="up-btn">파일 선택</div>
+      <input id="file" type="file" accept=".txt,text/plain" hidden>
+    </div>
+    <div class="detect" id="detect"></div>
+    <a class="guide-link" href="guide.html">📖 카톡 .txt 내보내는 법 (PC·아이폰·안드로이드)</a>
+
+    <div class="pick-label">2 · 무엇을 까볼까요?</div>
+
+    <a class="mode villain" id="m-villain" href="analyze.html">
+      <div class="price">무료</div>
+      <div class="m-row">
+        <div class="m-emoji">🏆</div>
+        <div class="m-main">
+          <div class="m-kicker">단톡방 · 친구 모임</div>
+          <div class="m-title">빌런 리포트</div>
+          <div class="m-desc">우리 단톡 숨은 빌런 시상식. 읽씹왕·먹튀·잠수왕 색출.</div>
+        </div>
+      </div>
+      <div class="m-foot">
+        <div class="m-tags"><span>😂 웃김</span><span>📤 공유각</span><span>👥 2인↑</span></div>
+        <div class="m-go">시작 →</div>
+      </div>
+    </a>
+
+    <a class="mode love" id="m-love" href="breakup-forecast.html">
+      <div class="price">무료</div>
+      <div class="m-row">
+        <div class="m-emoji">🌧️</div>
+        <div class="m-main">
+          <div class="m-kicker">1:1 · 연인 대화</div>
+          <div class="m-title">연인 예보</div>
+          <div class="m-desc">관계 일기예보. 애정 온도·답장속도로 식는 시점 예측.</div>
+        </div>
+      </div>
+      <div class="m-foot">
+        <div class="m-tags"><span>🔮 예측</span><span>🤫 혼자 몰래</span><span>💑 커플</span></div>
+        <div class="m-go">시작 →</div>
+      </div>
+    </a>
+
+    <div class="count">지금까지 <b>128,402개</b> 대화방이 까였습니다 👀</div>
+
+    <div class="privacy">
+      🔒 <b>대화는 서버에 안 올라갑니다.</b><br>
+      네 폰·브라우저 안에서만 분석하고 끝나면 사라집니다.
+    </div>
+  </div>
+
+  <script src="parser.js" charset="utf-8"></script>
+  <script>
+    const $ = (s) => document.querySelector(s);
+    const KEY_RAW = "tkb_raw", KEY_NAME = "tkb_name";
+
+    // 새로 들어왔으면 이전 업로드 흔적 표시 복원 (뒤로가기 등)
+    (function restore() {
+      const raw = sessionStorage.getItem(KEY_RAW);
+      if (raw) markReady(sessionStorage.getItem(KEY_NAME) || "업로드된 대화", raw);
+    })();
+
+    function markReady(name, raw) {
+      $("#up").classList.add("ready");
+      $("#up-ic").textContent = "✅";
+      $("#up-title").textContent = name;
+      $("#up-sub").textContent = "업로드됨 · 모드 선택하면 이 대화로 분석";
+      $("#up-btn").textContent = "변경";
+
+      // 인원 감지 → 모드 추천
+      try {
+        const p = KakaoParser.parseKakao(raw);
+        const n = p.participants.length;
+        const v = $("#m-villain"), l = $("#m-love");
+        v.classList.remove("reco"); l.classList.remove("reco");
+        if (n === 2) {
+          $("#detect").innerHTML = `💑 <b>1:1 대화</b> 감지 (${p.count.toLocaleString()}개) · <span class="rec">연인 예보 추천</span>`;
+          l.classList.add("reco");
+        } else if (n > 2) {
+          $("#detect").innerHTML = `👥 <b>${n}명 단톡</b> 감지 (${p.count.toLocaleString()}개) · <span class="rec">빌런 리포트 추천</span>`;
+          v.classList.add("reco");
+        } else {
+          $("#detect").innerHTML = `⚠ 인원 감지 실패 (${p.count}개). 카톡 .txt 형식 확인.`;
+        }
+      } catch (e) {
+        $("#detect").innerHTML = `⚠ 파싱 오류. 카톡 .txt 형식 확인.`;
+      }
+    }
+
+    function handleFile(f) {
+      if (!f) return;
+      if (!/\.txt$/i.test(f.name) && f.type && !/text/.test(f.type)) {
+        $("#detect").innerHTML = `⚠ <b>.txt 파일</b>만 올릴 수 있어요. (받은 파일: ${f.name})`;
+        return;
+      }
+      const rd = new FileReader();
+      rd.onload = () => {
+        const raw = rd.result;
+        const name = f.name.replace(/\.txt$/i, "");
+        sessionStorage.setItem(KEY_RAW, raw);
+        sessionStorage.setItem(KEY_NAME, name);
+        markReady(name, raw);
+      };
+      rd.onerror = () => { $("#detect").innerHTML = "⚠ 파일 읽기 실패. 다시 시도."; };
+      rd.readAsText(f, "utf-8");
+    }
+
+    $("#up").onclick = () => $("#file").click();
+    $("#file").onchange = (e) => handleFile(e.target.files[0]);
+
+    // 드래그 & 드롭 (PC) — 어디든 끌어다 놓으면 업로드
+    const up = $("#up");
+    ["dragenter", "dragover"].forEach(ev =>
+      document.addEventListener(ev, (e) => { e.preventDefault(); up.classList.add("drag"); }));
+    ["dragleave", "drop"].forEach(ev =>
+      document.addEventListener(ev, (e) => { e.preventDefault(); if (ev === "drop" || e.target === document.documentElement) up.classList.remove("drag"); }));
+    document.addEventListener("drop", (e) => {
+      e.preventDefault(); up.classList.remove("drag");
+      const f = e.dataTransfer && e.dataTransfer.files[0];
+      if (f) handleFile(f);
+    });
+
+    // 모드 카드는 <a href>로 그대로 이동. sessionStorage가 데이터 전달.
+    // 업로드 안 했으면 결과 페이지가 샘플로 폴백.
+  </script>
+</body>
+</html>
