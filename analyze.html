@@ -117,6 +117,7 @@
     </div>
 
     <div id="out"></div>
+    <div id="adslot"></div>
   </div>
 
   <div class="modal" id="modal">
@@ -134,6 +135,7 @@
   <script src="share.js" charset="utf-8"></script>
   <script>
     const $ = (s) => document.querySelector(s);
+    AdSlot.mount("#adslot"); // 고정 영역 광고 (애드핏 정책: 팝업 게재 불가)
 
     let curAnalysis = null, curRoom = "내 단톡방", curMode = "sample";
 
@@ -223,7 +225,7 @@
       const result = KakaoStats.select(curAnalysis);
       if (curMode === "mine") {
         // 내 결과 = 분석 중(10초) 광고 후 공개 + 완료 팝업
-        AdGate.run(10, "우리 단톡 분석 중").then(() => { render(result, curRoom, "mine"); showDone(result.awards.length); });
+        AdGate.run(2, "우리 단톡 분석 중").then(() => { render(result, curRoom, "mine"); showDone(result.awards.length); });
       } else {
         render(result, curRoom, "sample");   // 예시(광고)는 즉시
       }

@@ -148,6 +148,7 @@
     </div>
 
     <div id="out"></div>
+    <div id="adslot"></div>
   </div>
 
   <div class="modal" id="modal">
@@ -165,6 +166,7 @@
   <script src="share.js" charset="utf-8"></script>
   <script>
     const $ = (s) => document.querySelector(s);
+    AdSlot.mount("#adslot"); // 고정 영역 광고 (애드핏 정책: 팝업 게재 불가)
 
     // 온기 추세 → SVG path
     function trendSVG(trend) {
@@ -261,7 +263,7 @@
       if (curResult.error) { render(curResult, curMode); return; }
       if (curMode === "mine") {
         // 내 결과 = 분석 중(10초) 광고 후 공개 + 완료 팝업
-        AdGate.run(10, "우리 관계 분석 중").then(() => { render(curResult, "mine"); showDone(); });
+        AdGate.run(2, "우리 관계 분석 중").then(() => { render(curResult, "mine"); showDone(); });
       } else {
         render(curResult, "sample");   // 예시(광고)는 즉시
       }

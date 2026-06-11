@@ -1,5 +1,7 @@
-// ad.js — 업로드 후 "분석 중" 동안 광고를 보여주는 게이트. (카카오 애드핏)
+// ad.js — 분석중 게이트(광고 없음) + 본문 고정 광고 슬롯. (카카오 애드핏)
 // AdGate.run(seconds, title) → Promise (분석중 카운트 끝나고 '결과 보기' 누르면 resolve).
+// AdSlot.mount(elOrSelector) → 페이지 본문의 고정 영역에 광고 삽입.
+// ※ 애드핏 정책: 팝업/오버레이 안 광고 게재 불가 → 광고는 AdSlot(고정 영역)으로만 노출.
 //
 // 실광고 켜는 법:
 //   1) 카카오 애드핏(adfit.kakao.com) 가입 → 사이트 등록(배포 도메인) → 웹 배너 광고단위 생성
@@ -25,12 +27,19 @@
   .ag-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
   .ag-tag{font-size:11px;font-weight:900;color:#cfd6e6;background:#2a3040;padding:5px 11px;border-radius:7px;letter-spacing:.04em;}
   .ag-cd{font-size:13px;font-weight:900;color:#9aa3b8;}
-  .ag-ad{min-height:258px;border-radius:14px;background:linear-gradient(135deg,#1c2233,#141823);
-    border:1px dashed #38415a;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;}
-  .ag-ad-in{color:#7f879b;font-size:12px;line-height:1.8;padding:10px;}
-  .ag-ad-in .e{font-size:40px;}
-  .ag-ad-in b{display:block;font-size:16px;color:#cfd6e6;margin-top:6px;}
+  .ag-spin{min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+    color:#9aa3b8;font-size:13px;font-weight:700;}
+  .ag-spin .dot{width:46px;height:46px;border-radius:50%;border:4px solid #2a3040;border-top-color:#ffe600;
+    animation:agspin .8s linear infinite;}
+  @keyframes agspin{to{transform:rotate(360deg)}}
   .ag-note{font-size:11px;color:#7f879b;text-align:center;margin:12px 0;}
+  .adslot{margin:18px auto;max-width:344px;}
+  .adslot-label{font-size:10px;font-weight:800;letter-spacing:.12em;color:#9aa3b8;opacity:.75;margin:0 0 6px 4px;}
+  .adslot-box{min-height:250px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+    text-align:center;overflow:hidden;background:rgba(127,135,155,.08);border:1px dashed rgba(127,135,155,.35);}
+  .adslot-box .ag-ad-in{color:#7f879b;font-size:12px;line-height:1.8;padding:10px;}
+  .adslot-box .ag-ad-in .e{font-size:40px;}
+  .adslot-box .ag-ad-in b{display:block;font-size:16px;margin-top:6px;}
   .ag-btn{width:100%;padding:14px;border:0;border-radius:12px;font-size:14px;font-weight:900;
     background:#2a3040;color:#6b7488;cursor:not-allowed;transition:background .15s;}
   .ag-btn.ready{background:linear-gradient(90deg,#ffe600,#ffc400);color:#2a1d05;cursor:pointer;}
@@ -41,7 +50,7 @@
 
   // 애드핏 no-fill(광고 못 받음) → 플레이스홀더로 폴백
   g.adfitOnFail = function (el) {
-    const box = el && el.closest ? el.closest(".ag-ad") : null;
+    const box = el && el.closest ? el.closest(".adslot-box") : null;
     if (box) box.innerHTML = placeholder;
   };
 
@@ -70,13 +79,11 @@
       ov.innerHTML = `
         <div class="ag-box">
           <div class="ag-top"><span class="ag-tag">🔍 ${title}…</span><span class="ag-cd" id="ag-cd">${seconds}</span></div>
-          <div class="ag-ad">${adMarkup()}</div>
-          <div class="ag-note">분석이 끝나는 동안 잠깐 광고가 나와요</div>
+          <div class="ag-spin"><div class="dot"></div>대화를 까보는 중…</div>
           <button class="ag-btn" id="ag-btn" disabled>분석 중… ${seconds}초</button>
         </div>`;
       document.body.appendChild(ov);
       requestAnimationFrame(() => ov.classList.add("on"));
-      loadAdfit(ov.querySelector(".ag-ad"));
 
       let left = seconds;
       const btn = ov.querySelector("#ag-btn"), cd = ov.querySelector("#ag-cd");
@@ -97,5 +104,16 @@
     });
   }
 
+  // 본문 고정 광고 슬롯 — 페이지당 1회 mount, 재호출 무시(광고 재요청 방지)
+  function mount(el) {
+    if (typeof el === "string") el = document.querySelector(el);
+    if (!el || el.dataset.adMounted) return;
+    el.dataset.adMounted = "1";
+    el.classList.add("adslot");
+    el.innerHTML = `<div class="adslot-label">AD</div><div class="adslot-box">${adMarkup()}</div>`;
+    loadAdfit(el);
+  }
+
   g.AdGate = { run };
+  g.AdSlot = { mount };
 })(window);
