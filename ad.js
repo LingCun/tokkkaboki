@@ -11,7 +11,7 @@
   "use strict";
 
   // ===== 광고 설정 =====
-  const ADFIT_UNIT = "";              // ← 여기에 "DAN-xxxxxxxx" 입력
+  const ADFIT_UNIT = "DAN-Z9CQiyXSqwOD4DKQ"; // 톡까보기 분석중 300x250
   const ADFIT_W = 300, ADFIT_H = 250; // 미디엄 렉탱글 (애드핏 지원 사이즈)
   // =====================
 
@@ -57,7 +57,7 @@
     // 동적 삽입된 ins 를 렌더하려면 ba.min.js 를 (재)주입해 스캔 트리거
     const sc = document.createElement("script");
     sc.async = true; sc.charset = "utf-8";
-    sc.src = "https://t1.daumcdn.net/kas/static/ba.min.js";
+    sc.src = "https://t1.kakaocdn.net/kas/static/ba.min.js";
     scope.appendChild(sc);
   }
 
