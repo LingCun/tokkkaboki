@@ -108,10 +108,10 @@
       <div class="ic" id="up-ic">📂</div>
       <div class="u-t">
         <b id="up-title">카톡 대화 내보내기 업로드</b>
-        <span id="up-sub">채팅방 → 메뉴 → 대화 내보내기(.txt)</span>
+        <span id="up-sub">채팅방 → 메뉴 → 대화 내보내기 · 아이폰은 메일로 받은 <b>ZIP 그대로</b> OK</span>
       </div>
       <div class="u-btn" id="up-btn">파일 선택</div>
-      <input id="file" type="file" accept=".txt,text/plain" hidden>
+      <input id="file" type="file" accept=".txt,.zip,text/plain,application/zip,application/x-zip-compressed" hidden>
     </div>
     <div class="detect" id="detect"></div>
     <a class="guide-link" href="guide.html">📖 카톡 .txt 내보내는 법 (PC·아이폰·안드로이드)</a>
@@ -159,6 +159,7 @@
   </div>
 
   <script src="parser.js" charset="utf-8"></script>
+  <script src="upload.js" charset="utf-8"></script>
   <script>
     const $ = (s) => document.querySelector(s);
     const KEY_RAW = "tkb_raw", KEY_NAME = "tkb_name";
@@ -198,20 +199,17 @@
 
     function handleFile(f) {
       if (!f) return;
-      if (!/\.txt$/i.test(f.name) && f.type && !/text/.test(f.type)) {
-        $("#detect").innerHTML = `⚠ <b>.txt 파일</b>만 올릴 수 있어요. (받은 파일: ${f.name})`;
+      if (!/\.(txt|zip)$/i.test(f.name) && f.type && !/text|zip/.test(f.type)) {
+        $("#detect").innerHTML = `⚠ <b>.txt 또는 .zip 파일</b>만 올릴 수 있어요. (받은 파일: ${f.name})`;
         return;
       }
-      const rd = new FileReader();
-      rd.onload = () => {
-        const raw = rd.result;
-        const name = f.name.replace(/\.txt$/i, "");
+      if (/\.zip$/i.test(f.name)) $("#detect").innerHTML = "📦 ZIP에서 대화를 꺼내는 중…";
+      KakaoUpload.read(f).then((raw) => {
+        const name = f.name.replace(/\.(txt|zip)$/i, "");
         sessionStorage.setItem(KEY_RAW, raw);
         sessionStorage.setItem(KEY_NAME, name);
         markReady(name, raw);
-      };
-      rd.onerror = () => { $("#detect").innerHTML = "⚠ 파일 읽기 실패. 다시 시도."; };
-      rd.readAsText(f, "utf-8");
+      }).catch((err) => { $("#detect").innerHTML = `⚠ ${err.message || "파일 읽기 실패. 다시 시도."}`; });
     }
 
     $("#up").onclick = () => $("#file").click();

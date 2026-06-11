@@ -112,7 +112,7 @@
     <div class="panel">
       <div class="hero-t">🏆 우리 단톡, 진짜 <span class="y">빌런은 누구</span>일까?</div>
       <div class="hero-s">카톡 .txt 하나 올리면 끝. <b style="color:#cfd6e6">내 단톡방</b>으로 바로 시상식 시작.</div>
-      <label class="b-file">📂 내 카톡 .txt 올리기<input id="file" type="file" accept=".txt,text/plain" hidden></label>
+      <label class="b-file">📂 내 카톡 .txt/.zip 올리기<input id="file" type="file" accept=".txt,.zip,text/plain,application/zip,application/x-zip-compressed" hidden></label>
       <div class="alt"><a id="paste-toggle">텍스트 붙여넣기</a> · <a href="guide.html">내보내는 법</a> · <a id="sample-link">예시 다시 보기</a></div>
       <textarea id="raw" class="hide" placeholder="여기에 카톡 .txt 붙여넣기"></textarea>
       <div class="note">🔒 전부 이 브라우저 안에서만 처리 · 서버 전송 0 · 닫으면 사라짐</div>
@@ -133,6 +133,7 @@
   </div>
 
   <script src="parser.js" charset="utf-8"></script>
+  <script src="upload.js" charset="utf-8"></script>
   <script src="stats.js" charset="utf-8"></script>
   <script src="ad.js" charset="utf-8"></script>
   <script src="share.js" charset="utf-8"></script>
@@ -245,9 +246,9 @@
     $("#raw").addEventListener("input", (e) => { if (e.target.value.trim()) run(e.target.value, "내 단톡방", "mine"); });
     $("#file").onchange = (e) => {
       const f = e.target.files[0]; if (!f) return;
-      const rd = new FileReader();
-      rd.onload = () => run(rd.result, f.name.replace(/\.txt$/i, ""), "mine");
-      rd.readAsText(f, "utf-8");
+      KakaoUpload.read(f)
+        .then((raw) => run(raw, f.name.replace(/\.(txt|zip)$/i, ""), "mine"))
+        .catch((err) => { $("#out").innerHTML = `<div class="demo-cta"><div class="dc-ic">⚠</div><div class="dc-t"><b>파일을 못 읽었어요</b><span>${err.message || "다시 시도해주세요"}</span></div></div>`; });
     };
 
     // index에서 업로드한 대화(sessionStorage)면 '내 결과', 없으면 '예시' 광고 자동 표시
