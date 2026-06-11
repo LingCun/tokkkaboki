@@ -17,6 +17,12 @@
     c.textBaseline = "top";
     return { cv, c };
   }
+  // 폭을 넘는 텍스트는 말줄임(…) — 캔버스는 자동 줄바꿈이 없어 그대로 짤리기 때문
+  function fit(c, text, maxW) {
+    if (c.measureText(text).width <= maxW) return text;
+    while (text.length > 1 && c.measureText(text + "…").width > maxW) text = text.slice(0, -1);
+    return text + "…";
+  }
   function rr(c, x, y, w, h, r) {
     c.beginPath();
     c.moveTo(x + r, y);
@@ -38,26 +44,27 @@
     c.fillStyle = "#2a1d05"; c.font = `900 30px ${FONT}`;
     c.fillText("🏆 우리 단톡 빌런 리포트", 28, 32);
     c.fillStyle = "#6b5300"; c.font = `800 16px ${FONT}`;
-    c.fillText(`💬 ${room} · 멤버 ${result.meta.participants.length}명`, 28, 80);
+    c.fillText(fit(c, `💬 ${room} · 멤버 ${result.meta.participants.length}명`, W - 56), 28, 80);
     c.fillStyle = "#8a7300"; c.font = `600 13px ${FONT}`;
     c.fillText(`분석 메시지 ${result.meta.count.toLocaleString()}개`, 28, 106);
 
+    // 상 5개 + 하단 문구가 H(675) 안에 들어가도록 카드 높이 76·간격 9 (5개 = y 176~596)
     let y = 176;
     result.awards.slice(0, 5).forEach((a, i) => {
-      const x = 24, w = W - 48, h = 82;
+      const x = 24, w = W - 48, h = 76;
       rr(c, x, y, w, h, 16);
       c.fillStyle = i === 0 ? "#fff7e3" : "#ffffff"; c.fill();
       c.strokeStyle = i === 0 ? "#f3cf6b" : "#ece6d6"; c.lineWidth = 1.5; c.stroke();
-      c.textBaseline = "middle"; c.font = "38px sans-serif"; c.fillStyle = "#000";
+      c.textBaseline = "middle"; c.font = "34px sans-serif"; c.fillStyle = "#000";
       c.fillText(a.emoji, x + 16, y + h / 2);
       c.textBaseline = "top";
-      c.fillStyle = "#ff5a5f"; c.font = `800 14px ${FONT}`; c.fillText(a.key, x + 74, y + 16);
-      c.fillStyle = "#1d1b16"; c.font = `900 23px ${FONT}`; c.fillText(a.person, x + 74, y + 37);
+      c.fillStyle = "#ff5a5f"; c.font = `800 14px ${FONT}`; c.fillText(fit(c, a.key, w - 200), x + 70, y + 13);
+      c.fillStyle = "#1d1b16"; c.font = `900 22px ${FONT}`; c.fillText(fit(c, a.person, w - 200), x + 70, y + 33);
       c.textAlign = "right";
-      c.fillStyle = "#2a1d05"; c.font = `900 22px ${FONT}`; c.fillText(String(a.stat), x + w - 18, y + 22);
-      c.fillStyle = "#9c8a5a"; c.font = `700 11px ${FONT}`; c.fillText(a.statLabel, x + w - 18, y + 50);
+      c.fillStyle = "#2a1d05"; c.font = `900 22px ${FONT}`; c.fillText(String(a.stat), x + w - 18, y + 19);
+      c.fillStyle = "#9c8a5a"; c.font = `700 11px ${FONT}`; c.fillText(a.statLabel, x + w - 18, y + 46);
       c.textAlign = "left";
-      y += h + 11;
+      y += h + 9;
     });
 
     c.fillStyle = "#c2b9a6"; c.font = `700 13px ${FONT}`;
@@ -81,7 +88,7 @@
     c.fillText("관계 일기예보", W / 2, 34);
     c.font = "72px sans-serif"; c.fillStyle = "#fff"; c.fillText(result.wx, W / 2, 56);
     c.fillStyle = "#ff8fb0"; c.font = `800 15px ${FONT}`; c.fillText(result.alert, W / 2, 142);
-    c.fillStyle = "#e6d4ff"; c.font = `900 18px ${FONT}`; c.fillText(result.persona, W / 2, 172);
+    c.fillStyle = "#e6d4ff"; c.font = `900 18px ${FONT}`; c.fillText(fit(c, result.persona, W - 60), W / 2, 172);
 
     // 온도 큰 숫자
     c.fillStyle = "#ff6a8a"; c.font = `900 78px ${FONT}`; c.fillText(`${result.temp}%`, W / 2, 210);
