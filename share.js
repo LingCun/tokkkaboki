@@ -6,6 +6,7 @@
   "use strict";
 
   const FONT = '"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif';
+  const SITE_URL = "tokkkaboky.vercel.app";          // 카드·캡션에 박는 주소 (바이럴 루프)
   const S = 2;                       // 레티나 스케일 → 1080x1350 출력
   const W = 540, H = 675;
 
@@ -73,6 +74,10 @@
     c.fillText("톡까보기", 28, H - 40);
     c.fillStyle = "#8a7300"; c.font = `700 13px ${FONT}`;
     c.fillText("· 카톡 .txt 하나로 우리 단톡 까기", 108, H - 37);
+    c.textAlign = "right";
+    c.fillStyle = "#2a1d05"; c.font = `800 14px ${FONT}`;
+    c.fillText(SITE_URL, W - 28, H - 38);
+    c.textAlign = "left";
     return cv;
   }
 
@@ -121,6 +126,10 @@
     c.fillText("※ 애정온도는 답장속도·빈도 등 추정 (재미용)", 40, H - 62);
     c.fillStyle = "#c79bff"; c.font = `900 17px ${FONT}`; c.fillText("톡까보기", 40, H - 38);
     c.fillStyle = "#8a7fa6"; c.font = `700 13px ${FONT}`; c.fillText("· 연인 예보", 120, H - 35);
+    c.textAlign = "right";
+    c.fillStyle = "#b89bff"; c.font = `800 14px ${FONT}`;
+    c.fillText(SITE_URL, W - 40, H - 36);
+    c.textAlign = "left";
     return cv;
   }
 
@@ -144,11 +153,11 @@
 
   function villain(result, room) {
     const a0 = result.awards[0];
-    const caption = `우리 단톡 빌런 시상식 🏆\n1위 ${a0 ? a0.key + " " + a0.person : ""} 😂\n나도 까보기 → 톡까보기 #톡까보기 #빌런리포트`;
+    const caption = `우리 단톡 빌런 시상식 🏆\n1위 ${a0 ? a0.key + " " + a0.person : ""} 😂\n나도 까보기 → https://${SITE_URL}\n#톡까보기 #빌런리포트`;
     return shareCanvas(drawVillain(result, room || "내 단톡방"), caption, "tokkkaboki-villain.png");
   }
   function breakup(result) {
-    const caption = `우리 애정온도 ${result.temp}% ${result.wx}\n${result.persona}\n#톡까보기 #연인예보`;
+    const caption = `우리 애정온도 ${result.temp}% ${result.wx}\n${result.persona}\n우리도 까보기 → https://${SITE_URL}\n#톡까보기 #연인예보`;
     return shareCanvas(drawBreakup(result), caption, "tokkkaboki-breakup.png");
   }
 
